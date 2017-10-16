@@ -1,14 +1,11 @@
 package com.meme.jordan.messagetest1;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.WifiManager;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.format.Formatter;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -91,12 +88,5 @@ public class MainActivity extends AppCompatActivity implements MessageListener {
     public boolean onOptionsItemSelected(MenuItem item) {
         startActivity(new Intent(this, SettingsActivity.class));
         return true;
-    }
-
-    @SuppressWarnings("deprecation")
-    public String getServerIp() {
-        return Formatter.formatIpAddress(
-                ((WifiManager) getSystemService(Context.WIFI_SERVICE))
-                        .getConnectionInfo().getIpAddress());
     }
 }

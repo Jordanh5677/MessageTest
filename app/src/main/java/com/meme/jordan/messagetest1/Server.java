@@ -28,9 +28,12 @@ public class Server implements MessageSender {
     private ServerSocket server;
 
 
+    @SuppressWarnings("deprecation")
     public Server(MainActivity activity) {
         this.listener = activity;
-        listener.onMessage("Server IP: " + activity.getServerIp());
+        listener.onMessage("Server IP: " + Formatter.formatIpAddress(
+                ((WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE))
+                        .getConnectionInfo().getIpAddress()));
     }
 
     @Override
