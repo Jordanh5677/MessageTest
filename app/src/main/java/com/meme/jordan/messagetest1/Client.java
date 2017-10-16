@@ -36,6 +36,7 @@ public class Client implements MessageSender, Runnable {
                 socket = new Socket();
                 socket.bind(null);
                 socket.connect(new InetSocketAddress(host, Server.PORT));
+                listener.onMessage("Connected to " + host);
                 input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 output = new PrintWriter(socket.getOutputStream());
                 while (!Thread.interrupted()) {

@@ -40,6 +40,7 @@ public class Server implements Runnable, MessageSender {
             try {
                 server = new ServerSocket(PORT);
                 Socket client = server.accept();
+                listener.onMessage("Connection from " + client.getInetAddress().getHostAddress());
                 input = new Scanner(client.getInputStream());
                 output = new PrintWriter(client.getOutputStream());
                 while (input.hasNextLine() && !Thread.interrupted()) {
