@@ -58,6 +58,7 @@ public class Client implements MessageSender, Runnable {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                listener.onMessage("Disconnected from " + host);
             }
         }
     }
