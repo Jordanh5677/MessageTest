@@ -29,9 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="Enter Message"
-            android:inputType="textPersonName"
-            app:layout_constraintLeft_toLeftOf="parent"
-            tools:layout_editor_absoluteY="300dp" />
+            android:inputType="textPersonName" />
 
         <Button
             android:id="@+id/sendButton"
