@@ -15,14 +15,11 @@ import java.net.Socket;
  * Created by Jordan on 10/12/2017.
  */
 
-public class Client implements MessageSender, Runnable {
+public class Client implements MessageSender {
 
     private String host;
-    private Thread clntThread;
-    private Socket socket;
-    private BufferedReader input;
-    private PrintWriter output;
     private MessageListener listener;
+    private Connection connection;
 
     public Client(MainActivity activity) {
         this.listener = activity;
@@ -30,62 +27,85 @@ public class Client implements MessageSender, Runnable {
     }
 
     @Override
-    public void run() {
-        while (!Thread.interrupted()) {
-            try {
-                socket = new Socket();
-                socket.bind(null);
-                socket.connect(new InetSocketAddress(host, Server.PORT));
-                listener.onMessage("Connected to " + host);
-                input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                output = new PrintWriter(socket.getOutputStream());
-                while (!Thread.interrupted()) {
-                    while(!input.ready() && !Thread.interrupted())
-                        Thread.sleep(100);
-                    listener.onMessage(input.readLine());
-                }
-            } catch (IOException exc) {
-                Log.w(MainActivity.TAG, exc.getMessage());
-            } catch (InterruptedException exc) {
-            } finally {
-                try {
-                    if (input != null)
-                        input.close();
-                    if (output != null)
-                        output.close();
-                    if (socket != null)
-                        socket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                listener.onMessage("Disconnected from " + host);
-            }
-        }
-    }
-
-    @Override
     public void start() {
-        clntThread = new Thread(this);
-        clntThread.start();
+        stop();
+        connection = new Connection();
+        connection.start();
     }
 
     @Override
     public void stop() {
-        clntThread.interrupt();
+        if(connection != null)
+            connection.interrupt();
     }
 
     @Override
-    public void send(final String msg) {
-        if (output != null) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    if(output != null) {
-                        output.println(msg);
-                        output.flush();
-                    }
+    public void send(String msg) {
+        connection.send(msg);
+    }
+
+    private class Connection extends Thread {
+
+        private Socket socket;
+        private BufferedReader input;
+        private PrintWriter output;
+
+        @Override
+        public void run() {
+            try {
+                socket = new Socket(host, Server.PORT);
+                listener.onMessage("Connected to " + host);
+                input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                output = new PrintWriter(socket.getOutputStream());
+                while (!isInterrupted()) {
+                    String msg = input.readLine();
+                    if(msg == null) break;
+                    listener.onMessage(msg);
                 }
-            }).start();
+            } catch (IOException exc) {
+                //Log.w(MainActivity.TAG, exc.getMessage()); // Dont spam the log
+            } finally {
+                try {
+                    if (socket != null) {
+                        listener.onMessage("Disconnected from " + host);
+                        socket.close();
+                    }
+                    if (input != null)
+                        input.close();
+                    if (output != null)
+                        output.close();
+                } catch (IOException exc) {
+                    Log.e(MainActivity.TAG, exc.getMessage());
+                }
+
+                Client.this.start();
+            }
+        }
+
+        public void send(final String msg) {
+            if (output != null) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(output != null) {
+                            output.println(msg);
+                            output.flush();
+                        }
+                    }
+                }).start();
+            }
+        }
+
+        @Override
+        public void interrupt() {
+            try {
+                if (socket != null)
+                    socket.close();
+            } catch(IOException exc) {
+                Log.e(MainActivity.TAG, exc.getMessage());
+            } finally {
+                super.interrupt();
+            }
         }
     }
 }

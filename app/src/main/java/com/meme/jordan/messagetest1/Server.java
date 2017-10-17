@@ -32,14 +32,27 @@ public class Server implements MessageSender {
     public Server(MainActivity activity) {
         this.listener = activity;
         listener.onMessage("Server IP: " + Formatter.formatIpAddress(
-                ((WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE))
-                        .getConnectionInfo().getIpAddress()));
+                    ((WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE))
+                    .getConnectionInfo().getIpAddress()));
+        try {
+            server = new ServerSocket(PORT);
+        } catch (IOException exc) {
+            Log.e(MainActivity.TAG, exc.getMessage());
+        }
     }
 
     @Override
-    public void send(final String msg) {
+    public void send(String msg) {
         for (Connection c : connections)
-            c.send(msg);
+                c.send(msg);
+    }
+
+    public void receive(String msg, Connection con) {
+        listener.onMessage(msg);
+        for(Connection c : connections) {
+            if(c != con)
+                c.send(msg);
+        }
     }
 
     @Override
@@ -48,13 +61,18 @@ public class Server implements MessageSender {
             if(c.isInterrupted())
                 connections.remove(c);
         }
-        Connection t = new Connection(this);
+        Connection t = new Connection();
         t.start();
         connections.add(t);
     }
 
     @Override
     public void stop() {
+        try {
+            server.close();
+        } catch (IOException exc) {
+            Log.e(MainActivity.TAG, exc.getMessage());
+        }
         for(Connection c : connections)
             c.interrupt();
     }
@@ -62,55 +80,43 @@ public class Server implements MessageSender {
 
     private class Connection extends Thread {
 
-        private Server serverCtl;
         private BufferedReader input;
         private PrintWriter output;
         private String clntAddr;
-
-        Connection(Server server) {
-            this.serverCtl = server;
-        }
+        private Socket client;
 
         @Override
         public void run() {
-            while (!Thread.interrupted()) {
+            try {
+                client = server.accept();
+                Server.this.start();
+                clntAddr = client.getInetAddress().getHostAddress();
+                listener.onMessage(clntAddr + " connected");
+                input = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                output = new PrintWriter(client.getOutputStream());
+                while (!isInterrupted()) {
+                    String msg = input.readLine();
+                    if(msg == null) break;
+                    Server.this.receive(msg, this);
+                }
+                Server.this.receive(clntAddr + " disconnected", this);
+            } catch (IOException exc) {
+                Log.w(MainActivity.TAG, exc.getMessage());
+            } finally {
                 try {
-                    server = new ServerSocket(PORT);
-                    Socket client = server.accept();
-                    serverCtl.start();
-                    clntAddr = client.getInetAddress().getHostAddress();
-                    listener.onMessage("Connection from " + clntAddr);
-                    input = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                    output = new PrintWriter(client.getOutputStream());
-                    while (!Thread.interrupted()) {
-                        while(!input.ready() && !Thread.interrupted())
-                            Thread.sleep(100);
-                        String msg = input.readLine();
-                        listener.onMessage(msg);
-                        serverCtl.send(msg);
+                    if(client != null) {
+                        Server.this.receive(clntAddr + " disconnected", this);
+                        client.close();
                     }
+                    if (input != null)
+                        input.close();
+                    if (output != null)
+                        output.close();
                 } catch (IOException exc) {
-                    Log.w(MainActivity.TAG, exc.getMessage());
-                } catch (InterruptedException exc) {
-                } finally {
-                    try {
-                        if (input != null)
-                            input.close();
-                        if (output != null)
-                            output.close();
-                        if (server != null)
-                            server.close();
-                        String msg = "Disconnected from " + clntAddr;
-                        listener.onMessage(msg);
-                        serverCtl.send(msg);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    Log.e(MainActivity.TAG, exc.getMessage());
                 }
             }
-
         }
-
 
         public void send(final String msg) {
             new Thread(new Runnable() {
@@ -127,10 +133,10 @@ public class Server implements MessageSender {
         @Override
         public void interrupt() {
             try {
-                if (server != null)
-                    server.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+                if (client != null)
+                    client.close();
+            } catch(IOException exc) {
+                Log.e(MainActivity.TAG, exc.getMessage());
             } finally {
                 super.interrupt();
             }
