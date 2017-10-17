@@ -91,7 +91,7 @@ public class Server implements MessageSender {
                 client = server.accept();
                 Server.this.start();
                 clntAddr = client.getInetAddress().getHostAddress();
-                listener.onMessage(clntAddr + " connected");
+                Server.this.receive(clntAddr + " connected", this);
                 input = new BufferedReader(new InputStreamReader(client.getInputStream()));
                 output = new PrintWriter(client.getOutputStream());
                 while (!isInterrupted()) {
@@ -99,7 +99,6 @@ public class Server implements MessageSender {
                     if(msg == null) break;
                     Server.this.receive(msg, this);
                 }
-                Server.this.receive(clntAddr + " disconnected", this);
             } catch (IOException exc) {
                 Log.w(MainActivity.TAG, exc.getMessage());
             } finally {
