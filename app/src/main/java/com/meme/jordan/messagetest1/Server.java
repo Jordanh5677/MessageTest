@@ -6,14 +6,13 @@ import android.text.format.Formatter;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by Jordan on 10/10/2017.
@@ -24,7 +23,7 @@ public class Server implements MessageSender {
     static final int PORT = 8000;
 
     private MessageListener listener;
-    private ArrayList<Connection> connections = new ArrayList<>();
+    private List<Connection> connections = new CopyOnWriteArrayList<>();
     private ServerSocket server;
 
 

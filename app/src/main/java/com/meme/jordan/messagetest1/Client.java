@@ -6,9 +6,7 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.InterruptedIOException;
 import java.io.PrintWriter;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
@@ -35,7 +33,7 @@ public class Client implements MessageSender {
 
     @Override
     public void stop() {
-        if(connection != null)
+        if (connection != null)
             connection.interrupt();
     }
 
@@ -59,7 +57,7 @@ public class Client implements MessageSender {
                 output = new PrintWriter(socket.getOutputStream());
                 while (!isInterrupted()) {
                     String msg = input.readLine();
-                    if(msg == null) break;
+                    if (msg == null) break;
                     listener.onMessage(msg);
                 }
             } catch (IOException exc) {
@@ -78,7 +76,8 @@ public class Client implements MessageSender {
                     Log.e(MainActivity.TAG, exc.getMessage());
                 }
 
-                Client.this.start();
+                if (!isInterrupted())
+                    Client.this.start();
             }
         }
 
@@ -87,7 +86,7 @@ public class Client implements MessageSender {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        if(output != null) {
+                        if (output != null) {
                             output.println(msg);
                             output.flush();
                         }
@@ -101,7 +100,7 @@ public class Client implements MessageSender {
             try {
                 if (socket != null)
                     socket.close();
-            } catch(IOException exc) {
+            } catch (IOException exc) {
                 Log.e(MainActivity.TAG, exc.getMessage());
             } finally {
                 super.interrupt();
