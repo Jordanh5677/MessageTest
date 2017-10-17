@@ -99,7 +99,6 @@ public class Server implements MessageSender {
                     if(msg == null) break;
                     Server.this.receive(msg, this);
                 }
-                Server.this.receive(clntAddr + " disconnected", this);
             } catch (IOException exc) {
                 Log.w(MainActivity.TAG, exc.getMessage());
             } finally {
