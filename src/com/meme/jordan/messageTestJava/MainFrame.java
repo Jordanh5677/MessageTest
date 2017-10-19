@@ -37,6 +37,16 @@ public class MainFrame extends JFrame {
         layout.setConstraints(sendBtn, gbc);
         add(sendBtn);
 
+        JMenuItem menuitem = new JMenuItem("Options");
+
+        JMenu menu = new JMenu("Options");
+        menu.add(menuitem);
+
+        JMenuBar menubar = new JMenuBar();
+        menubar.add(menu);
+
+        setJMenuBar(menubar);
+
         setSize(500, 800);
         setLayout(layout);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
