@@ -2,8 +2,10 @@ package com.meme.jordan.messageTestJava;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
-public class MainFrame extends JFrame {
+public class MainFrame extends JFrame implements WindowListener {
 
     public MainFrame() {
 
@@ -38,6 +40,7 @@ public class MainFrame extends JFrame {
         add(sendBtn);
 
         JMenuItem menuitem = new JMenuItem("Options");
+        menuitem.addActionListener(e -> new OptionsFrame(MainFrame.this).showFrame());
 
         JMenu menu = new JMenu("Options");
         menu.add(menuitem);
@@ -49,11 +52,46 @@ public class MainFrame extends JFrame {
 
         setSize(500, 800);
         setLayout(layout);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        addWindowListener(this);
         setVisible(true);
     }
 
     public static void main(String... args) {
         new MainFrame();
+    }
+
+    @Override
+    public void windowOpened(WindowEvent windowEvent) {
+
+    }
+
+    @Override
+    public void windowClosing(WindowEvent windowEvent) {
+        System.exit(0);
+    }
+
+    @Override
+    public void windowClosed(WindowEvent windowEvent) {
+
+    }
+
+    @Override
+    public void windowIconified(WindowEvent windowEvent) {
+
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent windowEvent) {
+
+    }
+
+    @Override
+    public void windowActivated(WindowEvent windowEvent) {
+
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent windowEvent) {
+
     }
 }
