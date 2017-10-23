@@ -4,21 +4,47 @@ import javax.swing.*;
 import java.awt.*;
 
 public class OptionsFrame extends JFrame {
-    public OptionsFrame(MainFrame main) {
+	
+	JTextField nameField;
+	JCheckBox serverCheck;
+	JTextField ipField;
+	
+	String name;
+	boolean isServer;
+	String ip;
+	
+    public OptionsFrame() {
 
         GridBagLayout layout = new GridBagLayout();
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(3, 3, 3, 3);
 
-        JTextField nameField = new JTextField();
-        JCheckBox serverCheck = new JCheckBox();
-        JTextField ipField = new JTextField();
+         nameField = new JTextField();
+         serverCheck = new JCheckBox();
+         ipField = new JTextField();
+         
         JLabel nameLabel = new JLabel("Chat Name");
         JLabel serverLabel = new JLabel("Run as Server");
         JLabel ipLabel = new JLabel("Host IP Address");
+        
         JButton okButton = new JButton("OK");
         JButton cancelButton = new JButton("Cancel");
+
+        serverCheck.addItemListener(e -> {
+        	boolean disable = ((JCheckBox) e.getItem()).isSelected();
+        	ipField.setEnabled(!disable);
+        	ipLabel.setEnabled(!disable);
+        });
+        
+        okButton.addActionListener(e -> {
+        	name = nameField.getText();
+        	isServer = serverCheck.isSelected();
+        	ip = ipField.getText();
+        	setVisible(false);
+        });
+        
+        cancelButton.addActionListener(e -> setVisible(false));
 
         gbc.weightx = 0;
         gbc.gridwidth = GridBagConstraints.RELATIVE;
@@ -63,7 +89,16 @@ public class OptionsFrame extends JFrame {
         setResizable(false);
     }
 
-    public void showFrame(){
-        setVisible(true);
+    public String getName(){
+    	return name;
     }
+    
+    public boolean isServer() {
+    	return isServer;
+    }
+    
+    public String getIp(){
+    	return ip;
+    }
+    
 }

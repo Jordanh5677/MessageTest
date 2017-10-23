@@ -6,7 +6,9 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 public class MainFrame extends JFrame implements WindowListener {
-
+	
+	OptionsFrame options = new OptionsFrame();
+	
     public MainFrame() {
 
         GridBagLayout layout = new GridBagLayout();
@@ -40,7 +42,7 @@ public class MainFrame extends JFrame implements WindowListener {
         add(sendBtn);
 
         JMenuItem menuitem = new JMenuItem("Options");
-        menuitem.addActionListener(e -> new OptionsFrame(MainFrame.this).showFrame());
+        menuitem.addActionListener(e -> options.setVisible(true));
 
         JMenu menu = new JMenu("Options");
         menu.add(menuitem);
