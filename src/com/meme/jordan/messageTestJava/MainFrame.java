@@ -14,6 +14,7 @@ public class MainFrame extends JFrame implements WindowListener, MessageListener
     JTextArea displayText;
     JTextField inputText;
     JButton sendBtn;
+    JScrollPane scrollPane;
 
     public MainFrame() {
 
@@ -25,7 +26,7 @@ public class MainFrame extends JFrame implements WindowListener, MessageListener
         displayText = new JTextArea();
         displayText.setEditable(false);
 
-        JScrollPane scrollPane = new JScrollPane(displayText);
+        scrollPane = new JScrollPane(displayText);
 
         inputText = new JTextField();
         sendBtn = new JButton("Send");
@@ -123,13 +124,15 @@ public class MainFrame extends JFrame implements WindowListener, MessageListener
     @Override
     public void onMessage(String msg) {
         displayText.append(msg + "\n");
+        JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
+        scrollBar.setValue(scrollBar.getMaximum());
     }
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         String msg = options.getName() + ": " + inputText.getText();
         sender.send(msg);
-        displayText.append(msg + "\n");
+        onMessage(msg);
         inputText.setText("");
     }
 }
