@@ -13,7 +13,7 @@ public class OptionsFrame extends JFrame {
 	boolean isServer;
 	String ip;
 	
-    public OptionsFrame() {
+    public OptionsFrame(MainFrame main) {
 
         GridBagLayout layout = new GridBagLayout();
         GridBagConstraints gbc = new GridBagConstraints();
@@ -41,6 +41,7 @@ public class OptionsFrame extends JFrame {
         	name = nameField.getText();
         	isServer = serverCheck.isSelected();
         	ip = ipField.getText();
+        	main.updateSender();
         	setVisible(false);
         });
         
