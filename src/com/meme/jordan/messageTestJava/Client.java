@@ -47,6 +47,7 @@ public class Client implements MessageSender {
 
         @Override
         public void run() {
+        	if(host == null) return;
             try {
                 socket = new Socket(host, Server.PORT);
                 listener.onMessage("Connected to " + host);
