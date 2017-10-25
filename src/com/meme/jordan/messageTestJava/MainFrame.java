@@ -123,9 +123,11 @@ public class MainFrame extends JFrame implements WindowListener, MessageListener
 
     @Override
     public void onMessage(String msg) {
-        displayText.append(msg + "\n");
-        JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
-        scrollBar.setValue(scrollBar.getMaximum());
+        new Thread(() -> {
+            displayText.append(msg + "\n");
+            JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
+            scrollBar.setValue(scrollBar.getMaximum());
+        }).start();
     }
 
     @Override
