@@ -17,6 +17,7 @@ public class MainFrame extends JFrame implements WindowListener, MessageListener
     JScrollPane scrollPane;
 
     public MainFrame() {
+        super("Message");
 
         GridBagLayout layout = new GridBagLayout();
         GridBagConstraints gbc = new GridBagConstraints();

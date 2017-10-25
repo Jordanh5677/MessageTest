@@ -14,6 +14,7 @@ public class OptionsFrame extends JFrame {
 	String ip;
 	
     public OptionsFrame(MainFrame main) {
+        super("Options");
 
         GridBagLayout layout = new GridBagLayout();
         GridBagConstraints gbc = new GridBagConstraints();
